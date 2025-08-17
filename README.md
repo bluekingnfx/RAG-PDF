@@ -20,23 +20,27 @@ A Streamlit-based application that allows users to upload PDF documents and ask 
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/bluekingnfx/RAG-PDF.git
 cd askPdf
 ```
 
 2. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 3. Install and set up Ollama:
+
 ```bash
 # Install Ollama from https://ollama.ai
 ollama pull gemma3:1b
 ```
 
 4. Create a `.env` file in the project root:
+
 ```env
 HF_TOKEN=
 LANGCHAIN_API_KEY=
@@ -49,6 +53,7 @@ CHROMA_COLLECTION_NAME=resource
 ## Environment Variables
 
 Create a `.env` file with the following required variables:
+
 | Variable                  | Description                                                   | Example          |
 |---------------------------|---------------------------------------------------------------|------------------|
 | `HF_TOKEN`                | HuggingFace API token for embedding model access   | `hf_xxx`         |
@@ -57,12 +62,12 @@ Create a `.env` file with the following required variables:
 | `LANGCHAIN_PROJECT`       | Name of the LangChain project (optional)                      | `my_project`     |
 | `CHROMA_COLLECTION_NAME`  | Name for the ChromaDB collection to store document embeddings | `pdf_documents`  |
 
-
 > **Note**: LangChain keys (`LANGCHAIN_API_KEY` and `LANGCHAIN_TRACING_V2`) are optional and only required if you want to enable project tracing or advanced LangChain features.
 
 ## Usage
 
 1. Start the application:
+
 ```bash
 streamlit run index.py
 ```
@@ -78,6 +83,7 @@ streamlit run index.py
 ## How It Works
 
 ### Document Processing (`main_func.py:UploadClass`)
+
 1. **File Upload**: Saves uploaded PDF to temporary folder
 2. **Document Loading**: Uses PyPDFLoader to extract text content
 3. **Text Splitting**: Splits document into chunks (1000 chars, 100 overlap)
@@ -85,12 +91,14 @@ streamlit run index.py
 5. **Storage**: Stores embeddings in ChromaDB for retrieval
 
 ### Question Processing (`main_func.py:ProcessTheQuestion`)
+
 1. **Query Processing**: Takes user question as input
 2. **Retrieval**: Searches similar document chunks using vector similarity
 3. **Generation**: Uses Ollama's Gemma3:1b model to generate contextual answers
 4. **Response**: Returns answer with source document references
 
 ### Interface (`index.py`)
+
 - **Session Management**: Maintains upload status and chat history
 - **File Upload Interface**: Streamlit file uploader for PDFs
 - **Chat Interface**: Text area for questions with submit functionality
@@ -99,16 +107,17 @@ streamlit run index.py
 
 ## File Structure
 
-```
 askPdf/
-```
+
+```txt
+
 ├── index.py          # Main Streamlit application interface
 ├── main_func.py      # Core functionality classes
 ├── .env              # Environment variables
 ├── requirements.txt  # Python dependencies
 ├── temp/             # Temporary folder for PDF processing
 └── data/db/          # ChromaDB vector store directory
-```
+
 ```
 
 ## Controls
