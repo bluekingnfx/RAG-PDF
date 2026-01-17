@@ -1,6 +1,7 @@
 import typing as ty
 import os
 from streamlit.runtime.uploaded_file_manager import UploadedFile
+from streamlit import cache_resource
 from pathlib import Path
 from uuid import uuid4
 from langchain_community.document_loaders import PyPDFLoader
@@ -8,14 +9,35 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
-from langchain.chains.combine_documents import create_stuff_documents_chain #type:ignore
-from langchain.prompts import ChatPromptTemplate
-from langchain.chains.retrieval import create_retrieval_chain #type:ignore
+from langchain_classic.chains.combine_documents import create_stuff_documents_chain #type:ignore
+from langchain_classic.prompts import ChatPromptTemplate
+from langchain_classic.chains.retrieval import create_retrieval_chain #type:ignore
 from langchain_ollama import ChatOllama
 
-""" from langchain_core.vectorstores import VectorStoreRetriever """
+
 
 collection_name:str = os.environ.get('CHROMA_COLLECTION_NAME')#type:ignore
+
+
+@cache_resource
+def get_embeddings(model: str = 'all-MiniLM-L6-v2'):
+    return HuggingFaceEmbeddings(model=model)
+
+@cache_resource
+def get_ollama_model(model: str = 'gemma3:1b'):
+    return ChatOllama(model=model)
+
+
+@cache_resource
+def get_vector_store(model: str = 'all-MiniLM-L6-v2'):
+    embedder = get_embeddings(model)
+    return Chroma(
+        collection_name=collection_name,
+        embedding_function=embedder,
+        persist_directory='data/db',
+        create_collection_if_not_exists=True
+    )
+
 
 class UploadClass():
     def __init__(self, uploaded_file:UploadedFile, model:str='all-MiniLM-L6-v2'):
@@ -59,15 +81,7 @@ class UploadClass():
     
     def vectorizeAndUploadToStore(self):
         try:
-            embedder = HuggingFaceEmbeddings(
-                model = self.model
-            )
-            chroma = Chroma(
-                collection_name = collection_name,
-                embedding_function=embedder,
-                persist_directory='data/db',
-                create_collection_if_not_exists = True
-            )
+            chroma = get_vector_store(self.model)
             chroma.add_documents(self.splitted_docs)
             self.result = True
         except Exception as e:
@@ -97,22 +111,12 @@ class ProcessTheQuestion():
                 'role': self.role
             }
         )
-        chtModel = ChatOllama(
-            model = 'gemma3:1b',
-        )
+        chtModel = get_ollama_model('gemma3:1b')
         self.docChain  = create_stuff_documents_chain(chtModel,chtTemplate)
     def loadTheDb(self):
         
-            embedder = HuggingFaceEmbeddings(
-                model = self.model
-            )
-            vectorStore = Chroma(
-                collection_name = collection_name,
-                embedding_function=embedder,
-                persist_directory='data/db',
-                create_collection_if_not_exists = True
-            )
-            self.retriever = vectorStore.as_retriever()
+        vectorStore = get_vector_store(self.model)
+        self.retriever = vectorStore.as_retriever()
         
     def processPrompt(self,prompt:str) -> ty.Dict[str, ty.Any] | None:
         try:

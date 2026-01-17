@@ -6,8 +6,6 @@ load_dotenv('.env',override=True)
 from main_func import UploadClass,ProcessTheQuestion
 
 
-
-
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 if "processorInstance" not in st.session_state:
@@ -15,7 +13,6 @@ if "processorInstance" not in st.session_state:
 if 'uploaded' not in st.session_state:
     st.session_state.uploaded = False
 
-st.title("PDF Query Application")
 
 def processed_state(prompt:str):
     processed = st.session_state.processorInstance.processPrompt(prompt)
@@ -93,3 +90,4 @@ if st.session_state.uploaded == True:
     st.write('The document has been uploaded.')
 else:
     st.write('The document has been not uploaded.')
+    

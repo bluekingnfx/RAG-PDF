@@ -17,7 +17,7 @@ A Streamlit-based application that allows users to upload PDF documents and ask 
 - Ollama installed with Gemma3:1b model
 - Required Python packages (see requirements below)
 
-## Installation
+
 
 1. Clone the repository:
 
@@ -31,6 +31,26 @@ cd askPdf
 ```bash
 pip install -r requirements.txt
 ```
+
+**Option A: For exact reproducibility (recommended)**
+```bash
+pip install -r requirements_lock.txt
+```
+The `requirements_lock.txt` file contains all sub-dependencies with pinned versions used during development. This ensures you get the exact same environment for complete reproducibility.
+
+**Option B: For latest compatible versions**
+```bash
+pip install -r requirements.txt
+```
+This installs the direct dependencies and lets pip resolve the latest compatible sub-dependencies.
+
+**Option C: Upgrade existing installation**
+```bash
+pip install -r requirements.txt --upgrade
+```
+Use this to update to the latest compatible versions of all packages.
+
+
 
 3. Install and set up Ollama:
 
@@ -70,6 +90,12 @@ Create a `.env` file with the following required variables:
 
 ```bash
 streamlit run index.py
+```
+
+> **Note**: If you two python installations run the following command instead:
+
+```bash
+python -m streamlit run index.py
 ```
 
 2. Open your browser and navigate to the displayed URL (typically `http://localhost:8501`)
